@@ -27,7 +27,7 @@ function can($permission)
             'user.read',
             'user.update',
             'pegawai.manage',
-            'tunjangan.read',
+            'tunjangan.manage',
             'setting.manage'
         ]
      ];
