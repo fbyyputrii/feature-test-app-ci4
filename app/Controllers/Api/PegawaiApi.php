@@ -9,13 +9,14 @@ class PegawaiApi extends ResourceController
     protected $modelName = 'App\Models\PegawaiModel';
     protected $format    = 'json';
 
-    // ✅ GET (list)
+    // GET: list semua pegawai
     public function index()
     {
-        return $this->respond($this->model->findAll());
+        $data = $this->model->findAll();
+        return $this->respond(['status' => 'success', 'data' => $data]);
     }
 
-    // ✅ GET (detail)
+    // GET: detail pegawai
     public function show($id = null)
     {
         $data = $this->model->find($id);
@@ -24,24 +25,36 @@ class PegawaiApi extends ResourceController
             return $this->failNotFound('Data tidak ditemukan');
         }
 
-        return $this->respond($data);
+        return $this->respond(['status' => 'success', 'data' => $data]);
     }
 
-    // ✅ POST (create)
+    // POST: create pegawai baru
     public function create()
     {
         $data = $this->request->getJSON(true);
 
-        if (!$this->model->insert($data)) {
-            return $this->fail($this->model->errors());
+        $rules = [
+            'nama'  => 'required|min_length[3]',
+            'email' => 'required|valid_email|is_unique[pegawai.email]',
+            'phone' => 'required|min_length[10]|max_length[15]'
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->fail($this->validator->getErrors());
         }
 
-        return $this->respondCreated([
-            'message' => 'Data berhasil ditambahkan'
-        ]);
+        try {
+            $this->model->insert($data);
+            return $this->respondCreated([
+                'status' => 'success',
+                'message' => 'Data berhasil ditambahkan'
+            ]);
+        } catch (\Exception $e) {
+            return $this->failServerError('Gagal menyimpan data: ' . $e->getMessage());
+        }
     }
 
-    // ✅ PUT (update)
+    // PUT: update pegawai
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
@@ -50,24 +63,46 @@ class PegawaiApi extends ResourceController
             return $this->failNotFound('Data tidak ditemukan');
         }
 
-        $this->model->update($id, $data);
+        $rules = [
+            'nama'  => 'required|min_length[3]',
+            'email' => "required|valid_email|is_unique[pegawai.email,id,{$id}]",
+            'phone' => 'required|min_length[10]|max_length[15]'
+        ];
 
-        return $this->respond([
-            'message' => 'Data berhasil diupdate'
-        ]);
+        foreach ($rules as $key => $rule) {
+            $rules[$key] = str_replace('{id}', $id, $rule);
+        }
+
+        if (!$this->validate($rules)) {
+            return $this->fail($this->validator->getErrors());
+        }
+
+        try {
+            $this->model->update($id, $data);
+            return $this->respond([
+                'status' => 'success',
+                'message' => 'Data berhasil diupdate'
+            ]);
+        } catch (\Exception $e) {
+            return $this->failServerError('Gagal mengupdate data: ' . $e->getMessage());
+        }
     }
 
-    // ✅ DELETE
+    // DELETE: hapus pegawai
     public function delete($id = null)
     {
         if (!$this->model->find($id)) {
             return $this->failNotFound('Data tidak ditemukan');
         }
 
-        $this->model->delete($id);
-
-        return $this->respondDeleted([
-            'message' => 'Data berhasil dihapus'
-        ]);
+        try {
+            $this->model->delete($id);
+            return $this->respondDeleted([
+                'status' => 'success',
+                'message' => 'Data berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return $this->failServerError('Gagal menghapus data: ' . $e->getMessage());
+        }
     }
 }
