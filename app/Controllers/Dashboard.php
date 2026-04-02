@@ -56,16 +56,22 @@ class Dashboard extends BaseController
     }
 
     public function logs()
-{
-    $db = \Config\Database::connect();
+    {
+        $allowedPermissions = ['logs.manage'];
 
-    $logs = $db->table('logs')
-        ->select('logs.*, users.username')
-        ->join('users', 'users.id = logs.user_id')
-        ->orderBy('logs.id', 'DESC')
-        ->get()
-        ->getResultArray();
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
+        }
 
-    return view('logs/index', ['logs' => $logs]);
-}
+        $db = \Config\Database::connect();
+
+        $logs = $db->table('logs')
+            ->select('logs.*, users.username')
+            ->join('users', 'users.id = logs.user_id')
+            ->orderBy('logs.id', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        return view('logs/index', ['logs' => $logs]);
+    }
 }

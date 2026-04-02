@@ -11,13 +11,15 @@ class RoleController extends BaseController
     public function __construct()
     {
         $this->roleModel = new RoleModel();
-        if (!can('role.manage')) {
-            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
-        }
     }
 
     public function index()
     {
+        $allowedPermissions = ['role.manage'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
+        }
         $roles = $this->roleModel->findAll();
         return view('roles/index', compact('roles'));
     }
@@ -52,11 +54,12 @@ class RoleController extends BaseController
     }
     public function delete($id)
     {
-        if (!can('role.manage')) {
+        $allowedPermissions = ['role.manage'];
+
+        if (!canAny($allowedPermissions)) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
 
-        // cek apakah dipakai user
         $user = model('UserModel')->where('role_id', $id)->first();
 
         if ($user) {

@@ -15,10 +15,11 @@ class Pegawai extends BaseController
 
     public function index()
     {
-        if (!can('pegawai.view')) {
+        $allowedPermissions = ['pegawai.manage', 'pegawai.read'];
+
+        if (!canAny($allowedPermissions)) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
-
         $pegawai = $this->pegawaiModel->paginate(5);
 
         return view('pegawai/index', [
@@ -29,16 +30,20 @@ class Pegawai extends BaseController
 
     public function create()
     {
-        if (!can('pegawai.create')) {
-            return redirect()->to('/pegawai')->with('error', 'Akses ditolak');
+        $allowedPermissions = ['pegawai.manage', 'pegawai.create'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
         return view('pegawai/create');
     }
 
     public function store()
     {
-        if (!can('pegawai.create')) {
-            return redirect()->to('/pegawai')->with('error', 'Akses ditolak');
+        $allowedPermissions = ['pegawai.manage', 'pegawai.create'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
         $validation = \Config\Services::validation();
 
@@ -74,8 +79,10 @@ class Pegawai extends BaseController
 
     public function edit($id)
     {
-        if (!can('pegawai.update')) {
-            return redirect()->to('/pegawai')->with('error', 'Akses ditolak');
+        $allowedPermissions = ['pegawai.manage', 'pegawai.update'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
         $pegawai = $this->pegawaiModel->find($id);
 
@@ -88,8 +95,10 @@ class Pegawai extends BaseController
 
     public function update($id)
     {
-        if (!can('pegawai.update')) {
-            return redirect()->to('/pegawai')->with('error', 'Akses ditolak');
+        $allowedPermissions = ['pegawai.manage', 'pegawai.update'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
         $pegawaiLama = $this->pegawaiModel->find($id);
 
@@ -124,8 +133,10 @@ class Pegawai extends BaseController
 
     public function delete($id)
     {
-        if (!can('pegawai.delete')) {
-            return redirect()->to('/pegawai')->with('error', 'Akses ditolak');
+        $allowedPermissions = ['pegawai.manage', 'pegawai.delete'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
         $pegawai = $this->pegawaiModel->find($id);
 
@@ -141,7 +152,9 @@ class Pegawai extends BaseController
 
     public function detail($id)
     {
-        if (!can('pegawai.view')) {
+        $allowedPermissions = ['pegawai.manage', 'pegawai.read'];
+
+        if (!canAny($allowedPermissions)) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
         $pegawai = $this->pegawaiModel->find($id);

@@ -3,13 +3,35 @@
 
 <h3>Tambah User</h3>
 
+<?php if (session()->has('errors')): ?>
+    <div class="alert alert-danger">
+        <ul>
+            <?php foreach (session('errors') as $error): ?>
+                <li><?= esc($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
+<?php if (session()->has('error')): ?>
+    <div class="alert alert-danger">
+        <?= esc(session('error')) ?>
+    </div>
+<?php endif; ?>
+
+<?php if (session()->has('success')): ?>
+    <div class="alert alert-success">
+        <?= esc(session('success')) ?>
+    </div>
+<?php endif; ?>
+
 <form method="post" action="/users/store">
 
     <div class="mb-2">
         <label>Pegawai</label>
         <select name="pegawai_id" class="form-control">
-            <?php foreach($pegawai as $p): ?>
-            <option value="<?= $p['id'] ?>"><?= $p['nama'] ?></option>
+            <?php foreach ($pegawai as $p): ?>
+                <option value="<?= $p['id'] ?>"><?= $p['nama'] ?></option>
             <?php endforeach; ?>
         </select>
     </div>
@@ -17,8 +39,8 @@
     <div class="mb-2">
         <label>Role</label>
         <select name="role_id" class="form-control">
-            <?php foreach($roles as $r): ?>
-            <option value="<?= $r['id'] ?>"><?= $r['name'] ?></option>
+            <?php foreach ($roles as $r): ?>
+                <option value="<?= $r['id'] ?>"><?= $r['name'] ?></option>
             <?php endforeach; ?>
         </select>
     </div>

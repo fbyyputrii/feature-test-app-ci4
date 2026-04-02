@@ -3,6 +3,28 @@
 
 <h3>Edit User</h3>
 
+<?php if (session()->has('errors')): ?>
+    <div class="alert alert-danger">
+        <ul>
+            <?php foreach (session('errors') as $error): ?>
+                <li><?= esc($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
+<?php if (session()->has('error')): ?>
+    <div class="alert alert-danger">
+        <?= esc(session('error')) ?>
+    </div>
+<?php endif; ?>
+
+<?php if (session()->has('success')): ?>
+    <div class="alert alert-success">
+        <?= esc(session('success')) ?>
+    </div>
+<?php endif; ?>
+
 <form method="post" action="/users/update/<?= $user['id'] ?>">
 
     <div class="mb-2">

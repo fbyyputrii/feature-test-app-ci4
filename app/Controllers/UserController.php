@@ -17,14 +17,14 @@ class UserController extends BaseController
         $this->userModel = new UserModel();
         $this->pegawaiModel = new PegawaiModel();
         $this->roleModel = new RoleModel();
-        if (session()->get('role') != 'superadmin') {
-            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
-        }
     }
 
     public function index()
     {
-        if (!can('user.manage')) {
+
+        $allowedPermissions = ['user.manage', 'user.read'];
+
+        if (!canAny($allowedPermissions)) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
 
@@ -39,6 +39,12 @@ class UserController extends BaseController
 
     public function create()
     {
+        $allowedPermissions = ['user.manage'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
+        }
+
         $pegawai = $this->pegawaiModel->findAll();
         $roles = $this->roleModel->findAll();
 
@@ -46,8 +52,22 @@ class UserController extends BaseController
     }
     public function store()
     {
-        if (!can('user.manage')) {
-            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
+        $allowedPermissions = ['user.manage'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->back()->with('error', 'Akses ditolak');
+        }
+
+        $rules = [
+            'pegawai_id' => 'required|integer',
+            'role_id'    => 'required|integer',
+            'username'   => 'required|min_length[3]|max_length[20]|is_unique[users.username]',
+            'email'      => 'required|valid_email|is_unique[users.email]',
+            'phone'      => 'required|min_length[10]|max_length[15]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
         $password = 'User' . rand(1000, 9999) . '!A';
@@ -62,11 +82,17 @@ class UserController extends BaseController
             'is_active'  => 1
         ]);
 
-        return redirect()->to('/users')->with('success', 'Password: ' . $password);
+        return redirect()->to('/users')->with('success', "User berhasil ditambahkan. Password: $password");
     }
 
     public function edit($id)
     {
+        $allowedPermissions = ['user.manage', 'user.update'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
+        }
+
         $user = $this->userModel->find($id);
         $pegawai = $this->pegawaiModel->findAll();
         $roles = $this->roleModel->findAll();
@@ -76,6 +102,28 @@ class UserController extends BaseController
 
     public function update($id)
     {
+        $allowedPermissions = ['user.manage', 'user.update'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
+        }
+
+        $rules = [
+            'pegawai_id' => 'required|integer',
+            'role_id'    => 'required|integer',
+            'username'   => 'required|min_length[3]|max_length[20]|is_unique[users.username,id,{id}]',
+            'email'      => 'required|valid_email|is_unique[users.email,id,{id}]',
+            'phone'      => 'required|min_length[10]|max_length[15]',
+        ];
+
+        foreach ($rules as $key => $rule) {
+            $rules[$key] = str_replace('{id}', $id, $rule);
+        }
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
         $this->userModel->update($id, [
             'pegawai_id' => $this->request->getPost('pegawai_id'),
             'role_id'    => $this->request->getPost('role_id'),
@@ -85,12 +133,14 @@ class UserController extends BaseController
             'is_active'  => $this->request->getPost('is_active')
         ]);
 
-        return redirect()->to('/users');
+        return redirect()->to('/users')->with('success', 'Data user berhasil diupdate');
     }
 
     public function delete($id)
     {
-        if (!can('user.manage')) {
+        $allowedPermissions = ['user.manage'];
+
+        if (!canAny($allowedPermissions)) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
 

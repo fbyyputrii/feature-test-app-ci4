@@ -12,14 +12,14 @@ $routes->get('/login', 'Auth::login');
 $routes->post('/login', 'Auth::attemptLogin');
 $routes->get('/logout', 'Auth::logout');
 
-$routes->get('/dashboard', 'Dashboard::index', ['filter' => 'role:superadmin,manager,admin']);
+$routes->get('/dashboard', 'Dashboard::index');
 
 //pegawai
-$routes->get('/pegawai', 'Pegawai::index', ['filter' => 'role:superadmin,admin']);
-$routes->get('/pegawai/create', 'Pegawai::create', ['filter' => 'role:superadmin,admin']);
-$routes->post('/pegawai/store', 'Pegawai::store', ['filter' => 'role:superadmin,admin']);
-$routes->get('/pegawai/edit/(:num)', 'Pegawai::edit/$1', ['filter' => 'role:superadmin,admin']);
-$routes->post('/pegawai/update/(:num)', 'Pegawai::update/$1', ['filter' => 'role:superadmin,admin']);
+$routes->get('/pegawai', 'Pegawai::index');
+$routes->get('/pegawai/create', 'Pegawai::create');
+$routes->post('/pegawai/store', 'Pegawai::store');
+$routes->get('/pegawai/edit/(:num)', 'Pegawai::edit/$1');
+$routes->post('/pegawai/update/(:num)', 'Pegawai::update/$1');
 $routes->post('/pegawai/delete/(:num)', 'Pegawai::delete/$1');
 $routes->get('/pegawai/detail/(:num)', 'Pegawai::detail/$1');
 
@@ -29,7 +29,7 @@ $routes->get('/tunjangan/create', 'Tunjangan::create');
 $routes->post('/tunjangan/store', 'Tunjangan::store');
 
 //logs
-$routes->get('/logs', 'Dashboard::logs', ['filter' => 'role:superadmin']);
+$routes->get('/logs', 'Dashboard::logs');
 
 //users
 $routes->get('/users', 'UserController::index');

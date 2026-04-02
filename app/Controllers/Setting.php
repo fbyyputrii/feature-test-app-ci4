@@ -14,10 +14,12 @@ class Setting extends BaseController
         $this->settingModel = new SettingModel();
     }
 
-    
+
     public function index()
     {
-        if (!can('setting.view')) {
+        $allowedPermissions = ['setting.manage'];
+
+        if (!canAny($allowedPermissions)) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
         $setting = $this->settingModel->first();
@@ -29,8 +31,10 @@ class Setting extends BaseController
 
     public function update()
     {
-        if (!can('setting.update')) {
-            return redirect()->to('/setting')->with('error', 'Akses ditolak');
+        $allowedPermissions = ['setting.manage'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
         $rules = [
             'base_fare' => 'required|numeric|greater_than[0]'

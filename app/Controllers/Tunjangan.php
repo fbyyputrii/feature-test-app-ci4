@@ -22,7 +22,9 @@ class Tunjangan extends BaseController
 
     public function index()
     {
-        if (!can('tunjangan.view')) {
+        $allowedPermissions = ['tunjangan.manage', 'tunjangan.read'];
+
+        if (!canAny($allowedPermissions)) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
 
@@ -36,7 +38,9 @@ class Tunjangan extends BaseController
 
     public function create()
     {
-        if (!can('tunjangan.create')) {
+        $allowedPermissions = ['tunjangan.manage'];
+
+        if (!canAny($allowedPermissions)) {
             return redirect()->to('/tunjangan')->with('error', 'Akses ditolak');
         }
 
@@ -47,8 +51,10 @@ class Tunjangan extends BaseController
 
     public function store()
     {
-        if (!can('tunjangan.create')) {
-            return redirect()->to('/tunjangan')->with('error', 'Akses ditolak');
+        $allowedPermissions = ['tunjangan.manage'];
+
+        if (!canAny($allowedPermissions)) {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak');
         }
 
         $rules = [
